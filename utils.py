@@ -11,6 +11,9 @@ DEFAULT_SYNGATE_CONF = '/etc/modprobe.d/syngate.conf'
 TO_ADD = []
 TO_REMOVE = set()
 empty = {'psk_list': [], 'dstnet_list': [], 'precision_list': [], 'enable_antispoof_list': [], 'enable_udp_list': []}
+OLD_CONFIGURATION = ''
+OLD_TO_ADD = []
+OLD_TO_REMOVE = set()
 
 
 def parse_configuration_file(syngate_conf_path):
@@ -75,7 +78,9 @@ def check_values(net, psk, p, ea, eu):
 
 
 def update_configuration_file(syngate_conf, syngate_conf_path):
+    global OLD_CONFIGURATION
     try:
+        OLD_CONFIGURATION = open(syngate_conf_path, 'w').read()
         pattern = r'options SYNgate psk_list={% for psk in psk_list %}{{ psk }}{{ "," if not loop.last }}{% endfor %} ' \
                   r'dstnet_list={% for dstnet in dstnet_list %}{{ dstnet }}{{ "," if not loop.last }}{% endfor %} ' \
                   r'precision_list={% for precision in precision_list %}{{ precision }}{{ "," if not loop.last }}{% endfor %} ' \
@@ -88,12 +93,15 @@ def update_configuration_file(syngate_conf, syngate_conf_path):
             f.write(syngate_configuration)
         return True
     except:
+        OLD_CONFIGURATION = ''
         return None
 
 
 def merge_old_and_new_configuration():
+    global OLD_TO_REMOVE, OLD_TO_ADD
     content = parse_configuration_file(syngate_conf)
     new_content = copy.deepcopy(empty)
+    OLD_TO_REMOVE = TO_REMOVE
     for i in range(0, len(content['psk_list'])):
         if i not in TO_REMOVE:
             new_content['psk_list'].append(content['psk_list'][i])
@@ -103,6 +111,7 @@ def merge_old_and_new_configuration():
             new_content['enable_udp_list'].append(content['enable_udp_list'][i])
         else:
             TO_REMOVE.remove(i)
+    OLD_TO_ADD = TO_ADD
     while TO_ADD:
         net, psk, p, ea, eu = TO_ADD.pop(0)
         new_content['psk_list'].append(psk)
@@ -197,11 +206,26 @@ class SyngateConfPrompt(Cmd):
         print('Print the path of the syngate conf')
 
     def do_restart(self, inp):
+        global TO_ADD
+        global TO_REMOVE
         os.system('rmmod SYNgate')
         os.system('modprobe SYNgate')
+        r = os.popen('cat /etc/services').read()
+        if re.match(r'^SYNgate\s+\d+\s+\d+', r):
+            print('successfully restarted')
+        else:
+            TO_REMOVE = OLD_TO_REMOVE
+            TO_ADD = OLD_TO_ADD
+            os.system('rmmod SYNgate')
+            with open(syngate_conf, 'w') as f:
+                f.write(OLD_CONFIGURATION)
+            os.system('modprobe SYNgate')
+
 
     def help_restart(self):
-        print('Save file and try to restart Syngate. Needs superuser permissions')
+        print('Save file and try to restart Syngate.'
+              ' If the restart fails restores the old configuration and restarts again.'
+              ' Needs superuser permissions')
 
 
 if __name__ == '__main__':
