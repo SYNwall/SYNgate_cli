@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import copy
 import ipaddress
 import os
@@ -13,6 +14,10 @@ TO_ADD = []
 TO_REMOVE = set()
 empty = {'psk_list': [], 'dstnet_list': [], 'precision_list': [], 'enable_antispoof_list': [], 'enable_udp_list': []}
 
+# Check permissions
+if os.geteuid() != 0:
+    exit("You need to have root privileges. Exiting.")
+    sys.exit(1)
 
 def parse_configuration_file(syngate_conf_path):
 
