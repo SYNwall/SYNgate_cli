@@ -130,7 +130,7 @@ def banner():
 
 class SyngateConfPrompt(Cmd):
     prompt = 'sg> '
-    intro = "Syngate configurator, type ? to list commands"
+    intro = "SYNgate configurator, type ? to list commands"
 
     def do_list(self, inp):
         content = parse_configuration_file(syngate_conf)
@@ -174,7 +174,7 @@ class SyngateConfPrompt(Cmd):
         update_configuration_file(new_configuration, syngate_conf)
 
     def help_save(self):
-        print('Save new syngate configuration file')
+        print('Save new SYNgate configuration file')
 
     def do_remove(self, inp):
         try:
@@ -204,20 +204,24 @@ class SyngateConfPrompt(Cmd):
             print('*** ERROR: NOT A VALID FILE')
 
     def help_setconf(self):
-        print('Set a new path for the syngate configuration file')
+        print('Set a new path for the SYNgate configuration file')
 
     def do_getconf(self, inp):
         print(syngate_conf)
 
     def help_getconf(self):
-        print('Print the path of the syngate conf')
+        print('Print the path of the SYNgate conf')
 
     def do_restart(self, inp):
-        os.system('rmmod SYNgate')
+        try:
+            os.system('rmmod SYNgate')
+        except:
+            print('Error removing SYNgate. May be not loaded?')
+
         os.system('modprobe SYNgate')
 
     def help_restart(self):
-        print('Save file and try to restart Syngate. Needs superuser permissions')
+        print('Save file and try to restart SYNgate. Needs superuser permissions')
 
 
 if __name__ == '__main__':
