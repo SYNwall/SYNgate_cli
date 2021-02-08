@@ -1,4 +1,4 @@
-# SYNgate cli
+# SYNgate CLI
 
 This tool is useful to configure SYNgate without changing manually the configuration file
 
@@ -38,4 +38,4 @@ Here you can visualize and modify the current configuration.
 
 # Requirements
 
-You need Python3 and cmd2 and jinja modules.
+You need Python3 with cmd2 and jinja modules.
