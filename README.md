@@ -8,7 +8,7 @@ You need to run the script with a user that has read/write permissions on the SY
 
 Run the script to open an interactive prompt:
 
-    > sudo ./utils.py 
+    > sudo ./sg_shell.py 
     
           ^ ^
          |. o|
@@ -31,11 +31,11 @@ Run the script to open an interactive prompt:
 Here you can visualize and modify the current configuration.
 
     sg> list
-    #)      DSTNET  PSK     PRECISION       ENABLE_ANTISPOOF        ENABLE_UDP
-    0)      10.0.0.0/8      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        10      0       1
-    1)      10.5.0.0/16     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        10      0       1
-    2)      10.5.3.0/24     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        10      0       1
+    #)	DSTNET               PSK                                            PRECISION  ANTISPOOF        UDP
+     0)	192.168.1.0/24       XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX           10          0          0
+     1)	10.0.0.0/24          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX           10          0          0
+     2)	192.168.20.1/32      XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX           10          0          1
 
 # Requirements
 
-You need python 3 and the jinja2 module
+You need Python3 and cmd2 and jinja modules.
