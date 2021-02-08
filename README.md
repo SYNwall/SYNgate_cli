@@ -8,13 +8,25 @@ You need to run the script with a user that has read/write permissions on the SY
 
 Run the script to open an interactive prompt:
 
-    $ ./utils.py 
-    Syngate configurator, type ? to list commands
+    > sudo ./utils.py 
+    
+          ^ ^
+         |. o|
+         \ : /
+          | |
+        <#####>
+      <#SYNwall#>
+        <#####>
+    SYNgate configurator, type ? to list commands
     sg> ?
     
-    Documented commands (type help <topic>):
-    ========================================
-    add  exit  getconf  help  list  remove  restart  save  setconf
+    Documented commands (use 'help -v' for verbose/'help <topic>' for details):
+    ===========================================================================
+    add    exit     history  py      restart       save     shell    
+    alias  getconf  list     quit    run_pyscript  set      shortcuts
+    edit   help     macro    remove  run_script    setconf
+    
+    sg>
 
 Here you can visualize and modify the current configuration.
 
