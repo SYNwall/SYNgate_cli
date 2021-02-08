@@ -4,7 +4,7 @@ import ipaddress
 import os
 import re
 import stat
-from cmd import Cmd
+from cmd2 import Cmd
 
 import jinja2
 
