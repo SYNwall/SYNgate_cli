@@ -3,17 +3,21 @@ import copy
 import ipaddress
 import os
 import re
+import stat
 from cmd import Cmd
 
 import jinja2
 
-DEFAULT_SYNGATE_CONF = '/etc/modprobe.d/syngate.conf'
+DEFAULT_SYNGATE_CONF = '/etc/modprobe.d/SYNgate.conf'
 TO_ADD = []
 TO_REMOVE = set()
 empty = {'psk_list': [], 'dstnet_list': [], 'precision_list': [], 'enable_antispoof_list': [], 'enable_udp_list': []}
 
 
 def parse_configuration_file(syngate_conf_path):
+
+    content = ''
+
     try:
         with open(syngate_conf_path, 'r') as f:
             content = f.read()
@@ -41,10 +45,10 @@ def parse_configuration_file(syngate_conf_path):
 
 
 def print_table(content):
-    print('#)\tDSTNET\tPSK\tPRECISION\tENABLE_ANTISPOOF\tENABLE_UDP')
+    print('#)\t{0:20} {1:45} {2:>10} {3:>10} {4:>10}'.format('DSTNET','PSK','PRECISION','ANTISPOOF','UDP'))
     i = 0
     while i < len(content['psk_list']):
-        print('{}{})\t{}\t{}\t{}\t{}\t{}'.format('[remove]' if i in TO_REMOVE else '', i, content['dstnet_list'][i],
+        print('{0}{1:2})\t{2:20} {3:45} {4:>10} {5:>10} {6:>10}'.format('[remove]' if i in TO_REMOVE else '', i, content['dstnet_list'][i],
                                                  content['psk_list'][i], content['precision_list'][i],
                                                  content['enable_antispoof_list'][i], content['enable_udp_list'][i]))
         i += 1
@@ -52,7 +56,7 @@ def print_table(content):
     if TO_ADD:
         print('---------- TO ADD ----------')
     while j < len(TO_ADD):
-        print('{})\t{}\t{}\t{}\t{}\t{}'.format(i, TO_ADD[j][0], TO_ADD[j][1], TO_ADD[j][2], TO_ADD[j][3], TO_ADD[j][4]))
+        print('{0:2})\t{1:20} {2:45} {3:>10} {4:>10} {5:>10}'.format(i, TO_ADD[j][0], TO_ADD[j][1], TO_ADD[j][2], TO_ADD[j][3], TO_ADD[j][4]))
         i += 1
         j += 1
 
@@ -86,6 +90,8 @@ def update_configuration_file(syngate_conf, syngate_conf_path):
         # TODO save copy and test new configuration
         with open(syngate_conf_path, 'w') as f:
             f.write(syngate_configuration)
+        f.close()
+        os.chmod(syngate_conf_path,stat.S_IRUSR | stat.S_IWUSR)
         return True
     except:
         return None
@@ -112,6 +118,15 @@ def merge_old_and_new_configuration():
         new_content['enable_udp_list'].append(eu)
     return new_content
 
+def banner():
+    print()
+    print('      ^ ^')
+    print('     |. o|')
+    print('     \\ : /')
+    print('      | |')
+    print('    <#####>')
+    print('  <#SYNwall#>')
+    print('    <#####>')
 
 class SyngateConfPrompt(Cmd):
     prompt = 'sg> '
@@ -144,6 +159,7 @@ class SyngateConfPrompt(Cmd):
               'Example: add 10.0.0.0/8 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 10 0 1')
 
     def do_exit(self, inp):
+        os.chmod(DEFAULT_SYNGATE_CONF,stat.S_IRUSR | stat.S_IWUSR)
         if TO_ADD or TO_REMOVE:
             if input('You have unsaved work, want to exit anyway? (y): '):
                 return True
@@ -206,4 +222,5 @@ class SyngateConfPrompt(Cmd):
 
 if __name__ == '__main__':
     syngate_conf = DEFAULT_SYNGATE_CONF
+    banner()
     SyngateConfPrompt().cmdloop()
